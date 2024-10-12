@@ -28,5 +28,12 @@ document.querySelector('.form').addEventListener('submit', function(event){
     // posição 2 -> valor
     tdVolume.textContent = campos[1].value * campos[2].value;
     // add td que faltava a tr
-    tr.appendChild(tdVolume);
+    tbody.appendChild(tr)
+
+    // Limpa os campos data | quantidade | valor
+    campos[0].value = '';
+    campos[1].value = 1;
+    campos[2].value = 0;
+    // Foca no campo data
+    campos[0].focus();
 })
