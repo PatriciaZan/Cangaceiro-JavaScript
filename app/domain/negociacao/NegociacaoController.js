@@ -21,12 +21,21 @@ class NegociacaoController {
         console.log(parseFloat(this._inputValor.value));
         */
        
+        let data = new Date(...
+            this._inputData.value
+            .split('-')
+            .map(function(item, indice){
+                return item - indice % 2;
+        }));
+        console.log(data);
+        
+/*
         let negociacao = new Negociacao(
             this._inputData.value,
             parsenInt(this._inputQuantidade.value),
             parseFloat(this._inputValor.value)
         )
-
+*/
         console.log(negociacao);
         
 
