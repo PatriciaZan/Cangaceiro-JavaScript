@@ -1,23 +1,37 @@
 class NegociacaoController {
 
     constructor(){
-        let $ = document.querySelector.bind(document);
+        const $ = document.querySelector.bind(document);
 
         this._inputData = $('#data');
         this._inputQuantidade = $('#quantidade');
         this._inputValor = $('#valor');
-        this._negociacoes = new Negociacoes();
+
+        // self é a negociacaoController
+        //const self = this;
+
+        this._negociacoes = new Negociacoes(model => {
+            console.log(this);
+            this._negociacoesView.update(model);
+        });
+
         this._negociacoesView = new NegociacoesView('#negociacoes');
         this._negociacoesView.update(this._negociacoes);
-        // Atualiza a view
+        this._mensagem = new Mensagem();
+
+        this._mensagemView = new mensagemView('#mensagemView');
+        this._mensagemView.update(this._mensagem);
     }
      
 
     adiciona(event){
         event.preventDefault();
         this._negociacoes.adiciona(this._criaNegociacao());
-        this._negociacoesView.update(this._negociacoes);
+        //this._negociacoesView.update(this._negociacoes);
         //console.log(this._negociacoes);
+        this._mensagem.texto = 'Negociação adicionada com sucesso';
+        this._mensagemView.update(this._mensagem); // atualiza a view 
+
         this._limpaFormulario();// limpando o formulario
     }
 
@@ -34,6 +48,13 @@ class NegociacaoController {
             parseInt(this._inputQuantidade.value),
             parseFloat(this._inputValor.value)
         );
+    }
+
+    apaga(){
+        this._negociacoes.esvazia();
+        //this._negociacoesView.update(this._negociacoes);
+        this._mensagem.texto = 'Negociações apagadas com sucesso';
+        this._mensagemView.update(this._mensagem);
     }
 }
         
