@@ -7,32 +7,50 @@ class NegociacaoController {
         this._inputQuantidade = $('#quantidade');
         this._inputValor = $('#valor');
 
-        // self é a negociacaoController
-        //const self = this;
-
-        this._negociacoes = new Negociacoes(model => {
-            console.log(this);
-            this._negociacoesView.update(model);
-        });
-
+        // Com auxilio do ProxyFactory
+        this._negociacoes = new Bind(
+            new Negociacoes(),
+            new NegociacoesView('#negociacoes'),
+            'adiciona', 'esvazia'
+        );
+        /*
         this._negociacoesView = new NegociacoesView('#negociacoes');
         this._negociacoesView.update(this._negociacoes);
-        this._mensagem = new Mensagem();
+        */
+        this._mensagem = new Bind(
+            new Mensagem(),
+            new mensagemView('#mensagemView'),
+            'texto'
+        );
 
+        /*
         this._mensagemView = new mensagemView('#mensagemView');
         this._mensagemView.update(this._mensagem);
+        */
     }
      
 
     adiciona(event){
-        event.preventDefault();
-        this._negociacoes.adiciona(this._criaNegociacao());
+
+        try{
+            event.preventDefault();
+            this._negociacoes.adiciona(this._criaNegociacao());
+            this._mensagem.texto = 'Negociação adicionada com sucesso';
+            this._limpaFormulario();// limpando o formulario
+        } catch(err){
+            console.log(err);
+            this._mensagem.texto = err.message;
+            if(err instanceof DataInvalidaException){
+                this._mensagem.texto = err.mensagem;
+            } else{
+                this._mensagem.texto = 'Umero não esperado aconteceu. Entre em contato com o suporte'
+            }
+            
+        }
+
         //this._negociacoesView.update(this._negociacoes);
         //console.log(this._negociacoes);
-        this._mensagem.texto = 'Negociação adicionada com sucesso';
-        this._mensagemView.update(this._mensagem); // atualiza a view 
-
-        this._limpaFormulario();// limpando o formulario
+        //this._mensagemView.update(this._mensagem); // atualiza a view 
     }
 
     _limpaFormulario() {
@@ -54,7 +72,7 @@ class NegociacaoController {
         this._negociacoes.esvazia();
         //this._negociacoesView.update(this._negociacoes);
         this._mensagem.texto = 'Negociações apagadas com sucesso';
-        this._mensagemView.update(this._mensagem);
+        //this._mensagemView.update(this._mensagem);
     }
 }
         
@@ -62,6 +80,38 @@ class NegociacaoController {
 
     
 // Codigo Removido
+
+//Proxy
+        /*
+        // referencia para a instancia de NegociacaoController
+        const self = this;
+
+        this._negociacoes = new Proxy(new Negociacoes(), {
+            get (target, prop, receiver){
+                if(typeof(target[prop]) == typeof(Function) && ['adiciona', 'esvazia']
+                    .includes(prop)){
+                        return function(){
+                            console.log(`"${prop}" disparou a armadilha`);
+                            target[prop].apply(target, arguments)
+                            self._negociacoesView.update(target);
+                        }
+                    } else{
+                        return target[prop];
+                    }
+            }
+        });
+        */
+
+        // self é a negociacaoController
+        //const self = this;
+        /*
+        this._negociacoes = new Negociacoes(model => {
+            console.log(this);
+            this._negociacoesView.update(model);
+        });
+        */
+
+
 /* let inputData = document.querySelector('#data');
         // let inputQuantidade = document.querySelector('#quantidade');
         // let inputValor = document.querySelector('#valor');
