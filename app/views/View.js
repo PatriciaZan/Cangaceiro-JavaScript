@@ -1,10 +1,10 @@
 class View {
     constructor(seletor){
-        this._elemeto = document.querySelector(seletor);
+        this._elemento = document.querySelector(seletor);
     }
 
     update(model){
-        this._elemeto.innerHTML = this.template(model);
+        this._elemento.innerHTML = this.template(model);
     }
 
     template(model){

@@ -7,6 +7,8 @@ class NegociacaoController {
         this._inputQuantidade = $('#quantidade');
         this._inputValor = $('#valor');
 
+        this._service = new NegociacaoService();
+
         // Com auxilio do ProxyFactory
         this._negociacoes = new Bind(
             new Negociacoes(),
@@ -39,11 +41,12 @@ class NegociacaoController {
             this._limpaFormulario();// limpando o formulario
         } catch(err){
             console.log(err);
+            console.log(err.stack);
             this._mensagem.texto = err.message;
             if(err instanceof DataInvalidaException){
                 this._mensagem.texto = err.mensagem;
             } else{
-                this._mensagem.texto = 'Umero não esperado aconteceu. Entre em contato com o suporte'
+                this._mensagem.texto = 'Um ero não esperado aconteceu. Entre em contato com o suporte'
             }
             
         }
@@ -53,10 +56,35 @@ class NegociacaoController {
         //this._mensagemView.update(this._mensagem); // atualiza a view 
     }
 
+    importaNegociacoes(){
+        //const promise = this._service.obterNegociacoesDaSemana();
+        this._service.obterNegociacoesDaSemana()
+            .then(
+                negociacoes => {
+                    negociacoes.forEach(negociacao => this._negociacoes.adiciona(negociacao));
+                    this._mensagem.texto = 'Negociações importadas com sucesso';
+            },
+                    err => this._mensagem.texto = err
+        );
+        /*
+        this._service.obterNegociacoesDaSemana();
+
+        if(err) {
+            this._mensagem.texto = 'Não foi possível obter as negociações da semana';
+            return;
+            }
+
+            negociacoes.forEach(negociacao =>
+                this._negociacoes.adiciona(negociacao));
+                this._mensagem.texto = 'Negociações importadas com sucesso';
+    */
+        
+    }
+
     _limpaFormulario() {
         this._inputData.value = '';
         this._inputQuantidade.value = 1;
-        this._inputValor.value = 0.0
+        this._inputValor.value = 0.0;
         this._inputData.focus();
     }
 
@@ -80,6 +108,30 @@ class NegociacaoController {
 
     
 // Codigo Removido
+
+/*
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'negociacoes/semana');
+
+        xhr.onreadystatechange = () => {
+            if(xhr.readyState == 4){
+                if(xhr.status == 200){
+                    JSON
+                    .parse(xhr.responseText)
+                    .map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor))
+                    .forEach(negociacao => this._negociacoes.adiciona(negociacao));
+                    this._mensagem.texto = 'Negociações importadas com sucesso!';
+
+                    //console.log('Obtendo as negociações do servidor.');
+                    //console.log(JSON.parse(xhr.responseText));
+                } else {
+                    console.log(xhr.responseText);
+                    this._mensagem.texto = 'Não foi possível obter as negociações da semana.';
+                }
+            }
+        };
+        xhr.send();
+        */
 
 //Proxy
         /*
