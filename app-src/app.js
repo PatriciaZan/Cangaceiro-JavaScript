@@ -4,6 +4,8 @@
 //     controller.adiciona(event)
 // })
 
+import { NegociacaoController } from './domain/negociacao/NegociacaoController.js';
+
 const controller = new NegociacaoController();
 const $ = document.querySelector.bind(document);
 

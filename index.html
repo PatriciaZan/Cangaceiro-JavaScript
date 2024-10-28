@@ -5,23 +5,6 @@
     <title>Negociações</title>
     <link rel="stylesheet" href="css/bootstrap.css">
     <link rel="stylesheet" href="css/bootstrap-theme.css">
-
-    <!--<script defer src="./app/index.js"></script>-->
-    <!--
-    <script defer src="./app/domain/negociacao/Negociacao.js"></script>
-    <script defer src="./app/domain/negociacao/NegociacaoController.js"></script>
-    <script defer src="./app/converters/DateConverter.js"></script>
-    <script defer src="./app/domain/negociacao/Negociacoes.js"></script>
-    <script defer src="./app/views/View.js"></script>
-    <script defer src="./app/views/NegociacoesView.js"></script>
-    <script defer src="./app/models/Mensagem.js"></script>
-    <script defer src="./app/views/MensagemView.js"></script>
-    <script defer src="./app/util/ProxyFactory.js"></script>
-    <script defer src="./app/util/Bind.js"></script>
-    <script defer src="./app/util/ApplicationExeption.js"></script>
-    <script defer src="./app/converters/DataInvalidaExeption.js"></script>
-    <script defer src="./app/app.js"></script>
--->
     <script>
         /*
         const negociacao = new Proxy(new Negociacao(),{
@@ -58,6 +41,7 @@
 </head>
 <body class="container">
     
+    
     <h1 class="text-center">Negociações</h1>
 
     <div class="mensagemView"></div>
@@ -93,7 +77,7 @@
     <br>
     <br>
     
-
+<!--
     <script src="./app/domain/negociacao/Negociacao.js"></script>
     <script src="./app/domain/negociacao/NegociacaoController.js"></script>
     <script src="./app/converters/DateConverter.js"></script>
@@ -108,9 +92,18 @@
     <script src="./app/converters/DataInvalidaExeption.js"></script>
     <script src="./app/domain/negociacao/NegociacaoService.js"></script>
     <script src="./app/util/HttpService.js"></script>
+    <script src="./app/util/ConnectionFactory.js"></script>
+    <script src="./app/domain/negociacao/NegociacaoDao.js"></script>
+    <script src="./app/util/DaoFactory.js"></script>
     <script src="./app/app.js"></script>
-
+-->
     <div class="negociacoes"></div>
+    <script src="node_modules/systemjs/dist/system.js"></script>
+    <script>
+        System
+            .import('app/app.js')
+            .catch(err => console.error(err));
+    </script>
     <!--Movido para NegociacoesView.js
     <table class="table table-hover table-bordered">
         <thead>

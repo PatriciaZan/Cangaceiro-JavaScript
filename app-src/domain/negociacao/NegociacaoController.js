@@ -1,4 +1,17 @@
-class NegociacaoController {
+import { Negociacoes } from '../domain/negociacao/Negociacoes.js'
+;
+import { NegociacoesView } from '../ui/views/NegociacoesView.js';
+import { Mensagem } from '../ui/models/Mensagem.js';
+import { MensagemView } from '../ui/views/MensagemView.js';
+import { NegociacaoService } from '../domain/negociacao/NegociacaoService.js';
+
+import { getNegociacaoDao } from '../util/DaoFactory.js';
+import { DataInvalidaException } from '../ui/converters/DataInvalidaException.js';
+import { Negociacao } from '../domain/negociacao/Negociacao.js';
+import { Bind } from '../util/Bind.js';
+import { DateConverter } from '../ui/converters/DateConverter.js';
+
+export class NegociacaoController {
 
     constructor(){
         const $ = document.querySelector.bind(document);
@@ -29,16 +42,40 @@ class NegociacaoController {
         this._mensagemView = new mensagemView('#mensagemView');
         this._mensagemView.update(this._mensagem);
         */
+        this._init();
     }
-     
+    _init(){
+
+        
+        getNegociacaoDao()
+        .then(dao => dao.listaTodos())
+        .then(negociacoes => 
+            negociacoes.forEach(negociacao =>
+                this._negociacoes.adiciona(negociacao)))
+        .catch(err => this._mensagem.texto = err);
+    };
+
 
     adiciona(event){
-
+        event.preventDefault();
         try{
-            event.preventDefault();
-            this._negociacoes.adiciona(this._criaNegociacao());
-            this._mensagem.texto = 'Negociação adicionada com sucesso';
-            this._limpaFormulario();// limpando o formulario
+
+            //DaoFactory add
+            const negociacao = this._criaNegociacao();
+
+            //DaoFactory
+                getNegociacaoDao()
+                .then(dao => dao.adiciona(negociacao))
+                .then(() => {
+                    this._negociacoes.adiciona(negociacao);
+                    this._mensagem.texto = 'Negociação adicionada com sucesso';
+                    this._limpaFormulario();
+                })
+                .catch(err => this._mensagem.texto = err);
+
+            //this._negociacoes.adiciona(this._criaNegociacao());
+            //this._mensagem.texto = 'Negociação adicionada com sucesso';
+            //this._limpaFormulario();// limpando o formulario
         } catch(err){
             console.log(err);
             console.log(err.stack);
@@ -58,9 +95,11 @@ class NegociacaoController {
 
     importaNegociacoes(){
         //const promise = this._service.obterNegociacoesDaSemana();
+        /*
         const negociacoes = [];
 
-        this._service.obterNegociacoesDaSemana()
+        this._service
+            .obterNegociacoesDaSemana()
             .then(semana => {
                 negociacoes.push(...semana);
                 return this._service.obterNegociacoesDaSemanaAnterior();
@@ -71,7 +110,19 @@ class NegociacaoController {
                 this._mensagem.texto = 'Negociações importadas com sucesso';
             })
             .catch(err => this._mensagem.texto = err);
-        ;
+        */
+            
+        this._service
+        .obterNegociacoesDaSemana()
+        .then(negociacoes => {
+            negociacoes.filter(novaNegociacao => 
+                !this._negociacoes.paraArray().some(negociacaoExistente =>
+                    novaNegociacao.equals(negociacaoExistente)))
+        .forEach(negociacao => this._negociacoes.adiciona(negociacao));
+            this._mensagem.texto = 'Negociações importadas com sucesso';
+        })
+        .catch(err => this._mensagem.texto = err);
+
         /*
         this._service.obterNegociacoesDaSemana();
 
@@ -103,9 +154,18 @@ class NegociacaoController {
     }
 
     apaga(){
-        this._negociacoes.esvazia();
+        //DaoFactory
+            getNegociacaoDao()
+            .then(dao => dao.apagaTodos())
+            .then(() => {
+                this._negociacoes.esvazia();
+                this._mensagem.texto = 'Negociações apagadas com sucesso';
+            })
+            .catch(err => this._mensagem.texto = err);
+
+        //this._negociacoes.esvazia();
         //this._negociacoesView.update(this._negociacoes);
-        this._mensagem.texto = 'Negociações apagadas com sucesso';
+        //this._mensagem.texto = 'Negociações apagadas com sucesso';
         //this._mensagemView.update(this._mensagem);
     }
 }

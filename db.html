@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprendendo IndexedDB</title>
+</head>
+<body>
+    <script>
+        let connection = null;
+
+        // aumenta o numero da versão
+        //const openRequest = indexedDB.open('jscangaceiro', 1);
+        const openRequest = indexedDB.open('jscangaceiro', 2);
+        
+        openRequest.onupgradeneeded = e => {
+            console.log('Criando ou atualizando o banco');
+
+            //Obtem a conexão
+            connection = e.target.result;
+
+            // verifica se a store existe, se sim apaga a atual e cria uma nova
+            if(connection.objectStoreNames.contains('negociacoes')){
+            connection.deleteObjectStore('negociacoes');
+        }
+            connection.createObjectStore('negociacoes', { autoIncrement: true});
+        };
+
+        openRequest.onsuccess = e => {
+            console.log('Conexão realizada com sucesso');
+            // e.target.result é uma instancia de IDBDatabase
+            e.target.result;
+        };
+        openRequest.onerror = e => {
+            console.log(e.target.error);
+        }
+
+        // Função para adicionar negociações
+        function adiciona(){
+            const negociacao = new Negociacao(new Date(), 200, 1);
+
+            const request = connection
+                .transaction(['negociacoes'], 'readwrite')
+                .objectStore('negociacoes')
+                .add(negociacao);
+    
+            request.onsuccess = e => 
+                console.log('negociação salva com sucesso');
+            
+            request.onerror = e => 
+                console.log('Não foi possivél salvar a negociação');
+        }
+
+        function listaTodos(){
+            const negociacao = [];
+
+            const cursor = connection
+                .transaction(['negociacoes'], 'readwrite')
+                .objectStore('negociacoes')
+                .openCursor();
+
+            cursor.onsuccess = e => {
+                const atual = e.target.result;
+
+                if(atual){
+                    // nova instância antes de add no array
+                    const negociacao = new Negociacao(
+                        atual.value._data,
+                        atual.value._quantidade,
+                        atual.value._valor);
+
+                    negociacoes.push(atual.value);
+                    atual.continue()
+
+                } else {
+                    console.log(negociacoes);
+                }
+            };
+
+            cursor.onerror = e => {
+                console.log('Error:' + e.target.error.name);
+                
+            }
+        }
+    </script>
+
+    <script src="./app/domain/negociacao/Negociacao.js"></script>
+</body>
+</html>
+
+<script>
+    /*
+    const transaction = connection.transaction(['negociacoes'], 'readwrite');
+    const store = transaction.objectStore('negociacoes');
+    
+    const request = store.add(negociacao);
+    */
+</script>
