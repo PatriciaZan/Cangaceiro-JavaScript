@@ -1,5 +1,17 @@
+
 export class Negociacao{
     constructor(_data, _quantidade, _valor){
+
+        if(!_data){
+            throw new Error('data é um parâmetro obrigatório');
+        }
+        if(!_quantidade){
+            throw new Error('quantidade é um parâmetro obrigatório');
+        }
+        if(!_valor){
+            throw new Error('valor é um parâmetro obrigatório');
+        }
+
 
         Object.assign(this, {_quantidade, _valor});
         this._data = new Date(_data.getTime());

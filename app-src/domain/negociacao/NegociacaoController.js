@@ -13,18 +13,33 @@ import { DateConverter } from '../ui/converters/DateConverter.js';
 */
 import { Negociacoes, NegociacaoService, Negociacao} from '../../domain/index.js';
 import { NegociacoesView, MensagemView, Mensagem, DateConverter } from '../../ui/index.js';
-import { getNegociacaoDao, Bind, getExceptionMessage } from '../../util/index.js';
+import { getNegociacaoDao, Bind, getExceptionMessage, debounce, controller, bindEvent } from '../../util/index.js';
+import { obrigatorio } from "../../util/index.js";
+
+export class Negociacao{
+    constructor(
+        _data = obrigatorio('data'),
+        _quantidade = obrigatorio('quantidade'),
+        _valor = obrigatorio('valor')){
+            
+            Object.assign(this, {_quantidade, _valor});
+            this._data = new Date(_data.getTime());
+            Object.freeze(this);
+}}
+
+
+@controller('#data', '#quantidade', '#valor')
 export class NegociacaoController {
 
-    constructor(){
-        const $ = document.querySelector.bind(document);
+    constructor(_inputData, _inputQuantidade, _inputValor){
+        Object.assign(this, {_inputData, _inputQuantidade, _inputValor});
+        //const $ = document.querySelector.bind(document);
 
-        this._inputData = $('#data');
-        this._inputQuantidade = $('#quantidade');
-        this._inputValor = $('#valor');
+        //this._inputData = inputData;
+        //this._inputQuantidade = inputQuantidade;
+        //this._inputValor = inputValor;
 
-        this._service = new NegociacaoService();
-
+        
         // Com auxilio do ProxyFactory
         this._negociacoes = new Bind(
             new Negociacoes(),
@@ -35,17 +50,18 @@ export class NegociacaoController {
         this._negociacoesView = new NegociacoesView('#negociacoes');
         this._negociacoesView.update(this._negociacoes);
         */
-        this._mensagem = new Bind(
-            new Mensagem(),
-            new mensagemView('#mensagemView'),
-            'texto'
+       this._mensagem = new Bind(
+           new Mensagem(),
+           new mensagemView('#mensagemView'),
+           'texto'
         );
+        this._service = new NegociacaoService();
+        this._init();
 
         /*
         this._mensagemView = new mensagemView('#mensagemView');
         this._mensagemView.update(this._mensagem);
         */
-        this._init();
     }
     async _init(){
         try{
@@ -66,7 +82,8 @@ export class NegociacaoController {
         */
     };
 
-
+    @bindEvent('submit', '.form')
+    @debounce()
     async adiciona(event){
         try{
             event.preventDefault();
@@ -87,6 +104,8 @@ export class NegociacaoController {
         //this._mensagemView.update(this._mensagem); // atualiza a view 
     }
 
+    @bindEvent('click', '#botao-importa')
+    @debounce(1500)
     async importaNegociacoes(){  
         try{
             const negociacoes = await this._service.obterNegociacoesDoPeriodo();
@@ -116,6 +135,7 @@ export class NegociacaoController {
         );
     }
 
+    @bindEvent('click', '#botao-apaga')
     async apaga(){
         try{
             const dao = await getNegociacaoDao();
